@@ -43,19 +43,13 @@
 
 		static get properties() {
 			return {
-				_hass: {
-					type: Object,
-					observer: 'hassChanged'
-				},
-				_config: Object,
-				_buttonInformation: Object
+				_hass: {},
+				_config: {},
+				_buttonInformation: {}
 			}
 		}
 
 		setConfig(config) {
-			if (!this._hass || !config) {
-				return;
-			}
 			if (!config.entity) {
 				throw new Error("You need to define an entity");
 			}
@@ -68,20 +62,6 @@
 				buttonActiveColor: 'var(--primary-color)',
 				...config
 			};
-
-			const stateObj = this._hass.states[this._config.entity];
-			if (!stateObj) {
-				throw new Error("Not found");
-			}
-
-			while (buttons.pop()) {}
-			this._buttonInformation = {}
-			for (const speed of stateObj.attributes.speed_list) {
-				this.addButton(speed, stateObj.attributes.speed === speed)
-			}
-			if (this._config.reverseButtons) {
-				buttons.reverse()
-			}
 		}
 
 		addButton(name, active) {
@@ -98,27 +78,6 @@
 				_buttonInformation: newButtonInformation
 			});
 			buttons.push(html`<button class="speed" toggles .style=${this._buttonInformation[color]} name=${name} @click=${this.setSpeed} ?disabled=${this._buttonInformation[name]}>${displayName}</button>`);
-		}
-
-		hassChanged(hass) {
-			if (!hass || !this._config) {
-				return;
-			}
-			const config = this._config;
-			const stateObj = hass.states[config.entity];
-
-			const newButtonInformation = {...this._buttonInformation};
-			Object.keys(newButtonInformation).forEach(function(key) {
-				newButtonInformation[key]["state"] = false;
-				newButtonInformation[key]["color"] = this._config.buttonInactiveColor;
-			})
-			newButtonInformation[stateObj.attributes.speed] = {
-				"state": true,
-				"color": this._config.buttonActiveColor
-			}
-			this.setProperties({
-				_buttonInformation: newButtonInformation
-			});
 		}
 
 		stopPropagation(e) {
@@ -140,6 +99,40 @@
 
 		set hass(hass) {
 			this._hass = hass;
+
+			if (hass && this._config) {
+				if (buttons.length !== 0) {
+					const config = this._config;
+					const stateObj = hass.states[config.entity];
+
+					const newButtonInformation = {...this._buttonInformation};
+					Object.keys(newButtonInformation).forEach(function(key) {
+						newButtonInformation[key]["state"] = false;
+						newButtonInformation[key]["color"] = this._config.buttonInactiveColor;
+					})
+					newButtonInformation[stateObj.attributes.speed] = {
+						"state": true,
+						"color": this._config.buttonActiveColor
+					}
+					this.setProperties({
+						_buttonInformation: newButtonInformation
+					});
+				} else {
+					const stateObj = this._hass.states[this._config.entity];
+					if (!stateObj) {
+						throw new Error("Not found");
+					}
+
+					while (buttons.pop()) {}
+					this._buttonInformation = {}
+					for (const speed of stateObj.attributes.speed_list) {
+						this.addButton(speed, stateObj.attributes.speed === speed)
+					}
+					if (this._config.reverseButtons) {
+						buttons.reverse()
+					}
+				}
+			}
 		}
 	}
 
