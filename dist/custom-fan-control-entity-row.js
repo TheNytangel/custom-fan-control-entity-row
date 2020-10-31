@@ -314,6 +314,10 @@
 				this.hass.callService('fan', 'set_speed', {entity_id: this._config.entity, speed: speed});
 			}
 		}
+
+		set hass(hass) {
+			this.hass = hass;
+		}
 	}
 
 	customElements.define('custom-fan-control-entity-row', CustomFanRow);
