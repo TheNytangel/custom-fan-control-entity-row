@@ -62,6 +62,10 @@
 				buttonActiveColor: 'background-color: var(--primary-color)',
 				...config
 			};
+
+			if (this._hass) {
+				this.resetButtons();
+			}
 		}
 
 		addButton(name, active) {
@@ -114,20 +118,24 @@
 					}
 					this._buttonInformation = newButtonInformation;
 				} else {
-					const stateObj = this._hass.states[this._config.entity];
-					if (!stateObj) {
-						throw new Error("Not found");
-					}
-
-					while (buttons.pop()) {}
-					this._buttonInformation = {}
-					for (const speed of stateObj.attributes.speed_list) {
-						this.addButton(speed, stateObj.attributes.speed === speed)
-					}
-					if (this._config.reverseButtons) {
-						buttons.reverse()
-					}
+					this.resetButtons();
 				}
+			}
+		}
+
+		resetButtons() {
+			const stateObj = this._hass.states[this._config.entity];
+			if (!stateObj) {
+				throw new Error("Not found");
+			}
+
+			while (buttons.pop()) {}
+			this._buttonInformation = {}
+			for (const speed of stateObj.attributes.speed_list) {
+				this.addButton(speed, stateObj.attributes.speed === speed)
+			}
+			if (this._config.reverseButtons) {
+				buttons.reverse()
 			}
 		}
 	}
