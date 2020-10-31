@@ -74,9 +74,7 @@
 				"state": active,
 				"color": active ? this._config.buttonActiveColor : this._config.buttonInactiveColor
 			}
-			this.setProperties({
-				_buttonInformation: newButtonInformation
-			});
+			this._buttonInformation = newButtonInformation;
 			buttons.push(html`<button class="speed" toggles .style=${this._buttonInformation[color]} name=${name} @click=${this.setSpeed} ?disabled=${this._buttonInformation[name]}>${displayName}</button>`);
 		}
 
@@ -114,9 +112,7 @@
 						"state": true,
 						"color": this._config.buttonActiveColor
 					}
-					this.setProperties({
-						_buttonInformation: newButtonInformation
-					});
+					this._buttonInformation = newButtonInformation;
 				} else {
 					const stateObj = this._hass.states[this._config.entity];
 					if (!stateObj) {
