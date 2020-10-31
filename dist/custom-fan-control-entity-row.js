@@ -311,4 +311,4 @@ class CustomFanRow extends Polymer.Element {
 	}
 }
 	
-customElements.define('fan-control-entity-row', CustomFanRow);
+customElements.define('custom-fan-control-entity-row', CustomFanRow);
