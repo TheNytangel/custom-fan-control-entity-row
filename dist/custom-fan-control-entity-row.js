@@ -33,7 +33,7 @@
 		render() {
 			return html`
 			<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
-			<hui-generic-entity-row .hass=${_hass} config=${_config}>
+			<hui-generic-entity-row .hass=${this._hass} config=${this._config}>
 				<div class="horizontal justified layout" @click=${this.stopPropagation}>
 					${buttons}
 				</div>
@@ -97,7 +97,7 @@
 			this.setProperties({
 				_buttonInformation: newButtonInformation
 			});
-			buttons.push(html`<button class="speed" toggles .style=${_buttonInformation[color]} name=${name} @click=${this.setSpeed} ?disabled=${_buttonInformation[name]}>${displayName}</button>`);
+			buttons.push(html`<button class="speed" toggles .style=${this._buttonInformation[color]} name=${name} @click=${this.setSpeed} ?disabled=${this._buttonInformation[name]}>${displayName}</button>`);
 		}
 
 		hassChanged(hass) {
