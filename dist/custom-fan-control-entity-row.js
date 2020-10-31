@@ -1,61 +1,39 @@
-class CustomFanRow extends Polymer.Element {
+import { LitElement, html, css } from 'lit-element';
 
-	static get template() {
-		return Polymer.html`
+const buttons = [];
+
+class CustomFanRow extends LitElement {
+
+	static get styles() {
+		return css`
+			:host {
+				line-height: inherit;
+			}
+			.speed {
+				min-width: 30px;
+				max-width: 30px;
+				height: 30px;
+				margin-left: 2px;
+				margin-right: 2px;
+				background-color: #759aaa;
+				border: 1px solid lightgrey; 
+				border-radius: 4px;
+				font-size: 10px !important;
+				color: inherit;
+				text-align: center;
+				float: right !important;
+				padding: 1px;
+				cursor: pointer;
+			}
+		`;
+	}
+
+	render() {
+		return html`
 			<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
-			<style>
-				:host {
-					line-height: inherit;
-				}
-				.speed {
-					min-width: 30px;
-					max-width: 30px;
-					height: 30px;
-					margin-left: 2px;
-					margin-right: 2px;
-					background-color: #759aaa;
-					border: 1px solid lightgrey; 
-					border-radius: 4px;
-					font-size: 10px !important;
-					color: inherit;
-					text-align: center;
-					float: right !important;
-					padding: 1px;
-					cursor: pointer;
-				}
-			</style>
-			<hui-generic-entity-row hass="[[hass]]" config="[[_config]]">
-				<div class='horizontal justified layout' on-click="stopPropagation">
-					<button
-						class='speed'
-						style='[[_leftColor]]'
-						toggles name="[[_leftName]]"
-						on-click='setSpeed'
-						disabled='[[_leftState]]'>[[_leftText]]</button>
-					<button
-						class='speed'
-						style='[[_midLeftColor]]'
-						toggles name="[[_midLeftName]]"
-						on-click='setSpeed'
-						disabled='[[_midLeftState]]'>[[_midLeftText]]</button>
-					<button
-						class='speed'
-						style='[[_midColor]]'
-						toggles name="[[_midName]]"
-						on-click='setSpeed'
-						disabled='[[_midState]]'>[[_midText]]</button>
-					<button
-						class='speed'
-						style='[[_midColor]]'
-						toggles name="[[_midRightName]]"
-						on-click='setSpeed'
-						disabled='[[_midRightState]]'>[[_midRightText]]</button>
-					<button
-						class='speed'
-						style='[[_rightColor]]'
-						toggles name="[[_rightName]]"
-						on-click='setSpeed'
-						disabled='[[_rightState]]'>[[_rightText]]</button>
+			<hui-generic-entity-row .hass=${hass} config=${_config}>
+				<div class="horizontal justified layout" @click=${this.stopPropagation}>
+					${buttons}
 				</div>
 			</hui-generic-entity-row>
         `;
@@ -68,58 +46,83 @@ class CustomFanRow extends Polymer.Element {
 				observer: 'hassChanged'
 			},
 			_config: Object,
-			_stateObj: Object,
-			_leftColor: String,
-			_midLeftColor: String,
-			_midColor: String,
-			_midRightColor: String,
-			_rightColor: String,
-			_leftText: String,
-			_midLeftText: String,
-			_midText: String,
-			_midRightText: String,
-			_rightText: String,
-			_leftName: String,
-			_midLeftName: String,
-			_midName: String,
-			_midRightName: String,
-			_rightName: String,
-			_leftState: Boolean,
-			_midLeftState: Boolean,
-			_midState: Boolean,
-			_midRightState: Boolean,
-			_rightState: Boolean,
-
+			_buttonInformation: Object
 		}
 	}
 
 	setConfig(config) {
-		this._config = config;
-		
+		if (!config.entity) {
+			throw new Error("You need to define an entity");
+		}
+
 		this._config = {
 			customTheme: false,
 			sendStateWithSpeed: false,
 			reverseButtons: false,
-			isOffColor: '#f44c09',
+			buttonInactiveColor: 'var(--disabled-text-color)',
+			buttonActiveColor: 'var(--primary-color)',
+			/*isOffColor: '#f44c09',
 			isOnLowColor: '#43A047',
 			isOnMedColor: '#43A047',
 			isOnHiColor: '#43A047',
 			isOnMaxColor: '#43A047',
-			buttonInactiveColor: '#759aaa',
 			customOffText: 'OFF',
 			customLowText: 'LOW',
 			customMedText: 'MED',
 			customHiText: 'HIGH',
-			customMaxText: 'MAX',
+			customMaxText: 'MAX',*/
 			...config
-			};
+		};
+
+		const stateObj = this.hass.states[this._config.entity];
+		if (!stateObj) {
+			throw new Error("Not found");
+		}
+
+		while (buttons.pop()) {}
+		this._buttonInformation = {}
+		for (const speed of stateObj.attributes.speed_list) {
+			this.addButton(speed, stateObj.attributes.speed === speed)
+		}
+		if (this._config.reverseButtons) {
+			buttons.reverse()
+		}
+	}
+
+	addButton(name, active) {
+		let displayName = name.toUpperCase();
+		if (displayName.length > 4) {
+			displayName = displayName.substring(0, 3);
+		}
+		const newButtonInformation = {...this._buttonInformation};
+		newButtonInformation[name] = {
+			"state": active,
+			"color": active ? this._config.buttonActiveColor : this._config.buttonInactiveColor
+		}
+		this.setProperties({
+			_buttonInformation: newButtonInformation
+		});
+		buttons.push(html`<button class="speed" toggles .style=${_buttonInformation[color]} name=${name} @click=${this.setSpeed} ?disabled=${_buttonInformation[name]}>${displayName}</button>`);
 	}
 
 	hassChanged(hass) {
-
 		const config = this._config;
 		const stateObj = hass.states[config.entity];
-		const custTheme = config.customTheme;
+
+		const newButtonInformation = {...this._buttonInformation};
+		Object.keys(newButtonInformation).forEach(function(key) {
+			newButtonInformation[key]["state"] = false;
+			newButtonInformation[key]["color"] = this._config.buttonInactiveColor;
+		})
+		newButtonInformation[stateObj.attributes.speed] = {
+			"state": true,
+			"color": this._config.buttonActiveColor
+		}
+		this.setProperties({
+			_buttonInformation: newButtonInformation
+		});
+
+		/*const custTheme = config.customTheme;
 		const sendStateWithSpeed = config.sendStateWithSpeed;
 		const revButtons = config.reverseButtons;
 		const custOnLowClr = config.isOnLowColor;
@@ -290,7 +293,7 @@ class CustomFanRow extends Polymer.Element {
 				_midRightName: lowname,
 				_rightName: offname,
 			});
-		}
+		}*/
     }
 
 	stopPropagation(e) {
