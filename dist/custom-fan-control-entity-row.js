@@ -32,7 +32,7 @@
 
 		render() {
 			return html`
-			<style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+			<!--<style is="custom-style" include="iron-flex iron-flex-alignment"></style>-->
 			<hui-generic-entity-row .hass=${this._hass} config=${this._config}>
 				<div class="horizontal justified layout" @click=${this.stopPropagation}>
 					${buttons}
