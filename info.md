@@ -10,12 +10,12 @@ It uses the code that can be found in my fan control package @ https://github.co
 
 Installation:
 
-Copy the fan-control-entity-row.js file to the appropriate folder in your Home Assistant Configuration directory (/config/www/).
+Copy the custom-fan-control-entity-row.js file to the appropriate folder in your Home Assistant Configuration directory (/config/www/).
 
 Place the following in your "resources" section in your lovelace configuration (updating the localation to where you placed the above file):
 
   ```
-    - url: /local/fan-control-entity-row.js
+    - url: /local/custom-fan-control-entity-row.js
       type: js
   ```
     

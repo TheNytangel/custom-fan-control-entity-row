@@ -12,12 +12,12 @@ Follow the instructions there for installation making sure you note the "url:" s
 
 Conversely, if you don't use HACS you can install it manually by performing the following:
 
-Copy the fan-control-entity-row.js file to the appropriate folder in your Home Assistant Configuration directory (/config/www/).
+Copy the custom-fan-control-entity-row.js file to the appropriate folder in your Home Assistant Configuration directory (/config/www/).
 
 Place the following in your "resources" section in your lovelace configuration (updating the localation to where you placed the above file):
 
   ```yaml
-    - url: /local/fan-control-entity-row.js
+    - url: /local/custom-fan-control-entity-row.js
       type: module
   ```
     
