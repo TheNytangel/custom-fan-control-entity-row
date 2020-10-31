@@ -58,8 +58,8 @@
 				customTheme: false,
 				sendStateWithSpeed: false,
 				reverseButtons: false,
-				buttonInactiveColor: 'var(--disabled-text-color)',
-				buttonActiveColor: 'var(--primary-color)',
+				buttonInactiveColor: 'background-color: var(--disabled-text-color)',
+				buttonActiveColor: 'background-color: var(--primary-color)',
 				...config
 			};
 		}
