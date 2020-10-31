@@ -75,7 +75,7 @@
 				"color": active ? this._config.buttonActiveColor : this._config.buttonInactiveColor
 			}
 			this._buttonInformation = newButtonInformation;
-			buttons.push(html`<button class="speed" toggles .style=${this._buttonInformation[color]} name=${name} @click=${this.setSpeed} ?disabled=${this._buttonInformation[name]}>${displayName}</button>`);
+			buttons.push(html`<button class="speed" toggles .style=${this._buttonInformation[name]["color"]} name=${name} @click=${this.setSpeed} ?disabled=${this._buttonInformation[name]["state"]}>${displayName}</button>`);
 		}
 
 		stopPropagation(e) {
